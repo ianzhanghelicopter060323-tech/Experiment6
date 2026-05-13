@@ -10,7 +10,8 @@ class MyString
     public:
         MyString();
         MyString(const char *str_in);
-        MyString(const MyString &str);
+        MyString(const MyString &str); // copy construct function with parameter MyString &str
+        MyString(const string &str);   // copy construct function with parameter string &str
         ~MyString();
 
         // operator= reload
@@ -41,6 +42,15 @@ MyString::MyString(const MyString &str)
 
     string_ptr = new char [size];
     strcpy(string_ptr, str.string_ptr);
+    string_ptr[size-1] = '\0';
+}
+
+MyString::MyString(const string &str)
+{
+    int size = strlen(str.c_str()) + 1;
+
+    string_ptr = new char [size];
+    strcpy(string_ptr, str.c_str());
     string_ptr[size-1] = '\0';
 }
 
@@ -85,10 +95,22 @@ int main()
 {
     MyString my_str((char*)"Hello");
 
+    // test string-to-MyString
+    string str = "Sieg Heil";
+    MyString my_str_1(str);
+
+    // test envalue operator
+    MyString my_str_2 = my_str_1;
+
     // test print()
     my_str.print();
+    my_str_1.print();
+    my_str_2.print();
+
     // test mystringLen()
     cout << "length: " << my_str.mystringLen() << endl;
+    cout << "length1: " << my_str_1.mystringLen() << endl;
+    cout << "length2: " << my_str_2.mystringLen() << endl;
 
     return 0;
 }
