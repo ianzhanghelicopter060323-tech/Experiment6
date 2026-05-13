@@ -17,7 +17,7 @@ class MyString
         // operator= reload
         MyString &operator=(const MyString &other);
 
-        // insetation function
+        // string operator function
         // insert <char>str_to_insert in pos <int>i
         void insert(char str_to_insert, int i);
         // insert <char *>str_to_insert in pos <int>i
@@ -27,7 +27,11 @@ class MyString
 
         // string capitalization
         void capitalize();
+        // move number elements in order at rear 
         void moveNumber();
+        // string pairing
+        // SUCCEED: 1 FAILED: -1
+        static int strPair(MyString my_str_local, MyString ny_str_to_pair);
 
         void print() const; // print string
         int mystringLen() const; // get the length of the string('\0' not counted in)
@@ -166,6 +170,30 @@ void MyString::moveNumber()
     string_ptr = new_string_ptr;
 }
 
+int MyString::strPair(MyString my_str_local, MyString my_str_to_pair)
+{
+    int size_local = strlen(my_str_local.string_ptr);
+    int size_pair = strlen(my_str_to_pair.string_ptr);
+
+    if (size_local != size_pair) // if len not equal, straight FAIL
+        return -1;
+    
+    // otherwise size_local == size_pair
+    // int size = size_local;
+    int i = 0;
+    while (my_str_local.string_ptr[i] != '\0')
+    {
+        if (my_str_local.string_ptr[i] != my_str_to_pair.string_ptr[i]) // exist unpairing element
+        {
+            return -1;
+        }
+
+        i ++;
+    }
+
+    return 1;
+}
+
 
 MyString &MyString::operator=(const MyString &other)
 {
@@ -215,6 +243,10 @@ int main()
 
     // test envalue operator
     MyString my_str_2 = my_str_1;
+
+    // pairng check
+    cout << "pairing code: " << MyString::strPair(my_str_2, my_str) << endl;
+
 
     // test print()
     my_str.print();
