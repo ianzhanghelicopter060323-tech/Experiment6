@@ -2,16 +2,6 @@
 #include <cstring>
 using namespace std;
 
-int charLen(const char *str)
-{
-    int len = 0;
-    while (str != nullptr && str[len] != '\0')
-    {
-        len ++;
-    }
-    return len;
-}
-
 
 class MyString
 {
@@ -37,6 +27,7 @@ class MyString
 
         // string capitalization
         void capitalize();
+        void moveNumber();
 
         void print() const; // print string
         int mystringLen() const; // get the length of the string('\0' not counted in)
@@ -146,6 +137,35 @@ void MyString::capitalize()
     }
 }
 
+void MyString::moveNumber()
+{
+    int len = strlen(string_ptr); // create new array instead of moving elements in original array
+    char *new_string_ptr = new char [len + 1];
+    int index = 0;
+
+    for (int i = 0; i < len; i ++)
+    {
+        if (!(string_ptr[i] >= '0' && string_ptr[i] <= '9'))
+        {
+            new_string_ptr[index] = string_ptr[i];
+            index ++;
+        }
+    }
+
+    for (int i = 0; i < len; i ++)
+    {
+        if (string_ptr[i] >= '0' && string_ptr[i] <= '9')
+        {
+            new_string_ptr[index] = string_ptr[i];
+            index ++;
+        }
+    }
+
+    new_string_ptr[index] = '\0';
+    delete [] string_ptr;
+    string_ptr = new_string_ptr;
+}
+
 
 MyString &MyString::operator=(const MyString &other)
 {
@@ -179,7 +199,7 @@ int MyString::mystringLen() const
 
 int main()
 {
-    MyString my_str((char*)"H1e1l4l5o||");
+    MyString my_str((char*)"H1e2llo");
 
     // test string-to-MyString
     string str = "Sieg Heil";
@@ -190,6 +210,8 @@ int main()
 
     // capitalization function test
     my_str.capitalize();
+    // move number function test
+    my_str.moveNumber();
 
     // test envalue operator
     MyString my_str_2 = my_str_1;
