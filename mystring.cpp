@@ -2,6 +2,16 @@
 #include <cstring>
 using namespace std;
 
+int charLen(const char *str)
+{
+    int len = 0;
+    while (str != nullptr && str[len] != '\0')
+    {
+        len ++;
+    }
+    return len;
+}
+
 
 class MyString
 {
@@ -16,6 +26,14 @@ class MyString
 
         // operator= reload
         MyString &operator=(const MyString &other);
+
+        // insetation function
+        // insert <char>str_to_insert in pos <int>i
+        void insert(char str_to_insert, int i);
+        // insert <char *>str_to_insert in pos <int>i
+        void insert(const char *str_to_insert, int i);
+        // insert <MyString>str_to_insert in pos <int>i
+        void insert(const MyString &str_to_insert, int i);
 
         void print() const; // print string
         int mystringLen() const; // get the length of the string('\0' not counted in)
@@ -61,6 +79,54 @@ MyString::~MyString()
 }
 
 
+void MyString::insert(char str_to_insert, int i) 
+    {
+        char temp[2] = {str_to_insert, '\0'};
+        insert(temp, i);
+    }
+
+void MyString::insert(const char *str_to_insert, int i)
+{
+    int old_size = strlen(string_ptr);
+    int insert_size = strlen(str_to_insert);
+    if (i < 0 || i > old_size)
+    {
+        cout << "ERROR! invalid insert position" << endl;
+        return ;
+    }
+
+    char *new_string_ptr = new char [old_size + insert_size + 1];
+    int index = 0;
+
+    for (int j = 0; j < i; j ++)
+    {
+        new_string_ptr[index] = string_ptr[j];
+        index ++;
+    }
+
+    for (int j = 0; j < insert_size; j ++)
+    {
+        new_string_ptr[index] = str_to_insert[j];
+        index ++;
+    }
+
+    for (int j = i; j < old_size; j ++)
+    {
+        new_string_ptr[index] = string_ptr[j];
+        index ++;
+    }
+
+    new_string_ptr[index] = '\0';
+    delete [] string_ptr;
+    string_ptr = new_string_ptr;
+}
+
+void MyString::insert(const MyString &str_to_insert, int i)
+{
+    insert(str_to_insert.string_ptr, i);
+}
+
+
 MyString &MyString::operator=(const MyString &other)
 {
     if (this != &other)
@@ -98,6 +164,9 @@ int main()
     // test string-to-MyString
     string str = "Sieg Heil";
     MyString my_str_1(str);
+
+    // insert <char *>str
+    my_str_1.insert(my_str, 2);
 
     // test envalue operator
     MyString my_str_2 = my_str_1;
