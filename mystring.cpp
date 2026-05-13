@@ -35,6 +35,9 @@ class MyString
         // insert <MyString>str_to_insert in pos <int>i
         void insert(const MyString &str_to_insert, int i);
 
+        // string capitalization
+        void capitalize();
+
         void print() const; // print string
         int mystringLen() const; // get the length of the string('\0' not counted in)
 };
@@ -80,39 +83,41 @@ MyString::~MyString()
 
 
 void MyString::insert(char str_to_insert, int i) 
-    {
-        char temp[2] = {str_to_insert, '\0'};
-        insert(temp, i);
-    }
+{
+    char temp[2] = {str_to_insert, '\0'};
+    insert(temp, i);
+}
 
 void MyString::insert(const char *str_to_insert, int i)
 {
     int old_size = strlen(string_ptr);
     int insert_size = strlen(str_to_insert);
+
     if (i < 0 || i > old_size)
     {
         cout << "ERROR! invalid insert position" << endl;
         return ;
     }
 
+
     char *new_string_ptr = new char [old_size + insert_size + 1];
     int index = 0;
 
     for (int j = 0; j < i; j ++)
     {
-        new_string_ptr[index] = string_ptr[j];
+        new_string_ptr[index] = string_ptr[j]; // source string copy
         index ++;
     }
 
     for (int j = 0; j < insert_size; j ++)
     {
-        new_string_ptr[index] = str_to_insert[j];
+        new_string_ptr[index] = str_to_insert[j]; // copy str_to_insert at specific place
         index ++;
     }
 
     for (int j = i; j < old_size; j ++)
     {
-        new_string_ptr[index] = string_ptr[j];
+        new_string_ptr[index] = string_ptr[j]; // move string after postion i backward
         index ++;
     }
 
@@ -124,6 +129,21 @@ void MyString::insert(const char *str_to_insert, int i)
 void MyString::insert(const MyString &str_to_insert, int i)
 {
     insert(str_to_insert.string_ptr, i);
+}
+
+
+void MyString::capitalize()
+{
+    int i=0;
+    while (string_ptr[i] != '\0')
+    {
+        if (string_ptr[i] >= 'a' && string_ptr[i] <= 'z')
+        {
+            string_ptr[i] += ('A' - 'a');
+        }
+        
+        i ++;
+    }
 }
 
 
@@ -159,7 +179,7 @@ int MyString::mystringLen() const
 
 int main()
 {
-    MyString my_str((char*)"Hello");
+    MyString my_str((char*)"H1e1l4l5o||");
 
     // test string-to-MyString
     string str = "Sieg Heil";
@@ -167,6 +187,9 @@ int main()
 
     // insert <char *>str
     my_str_1.insert(my_str, 2);
+
+    // capitalization function test
+    my_str.capitalize();
 
     // test envalue operator
     MyString my_str_2 = my_str_1;
