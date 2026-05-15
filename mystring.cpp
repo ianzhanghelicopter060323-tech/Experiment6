@@ -16,6 +16,7 @@ class MyString
 
         // operator= reload
         MyString &operator=(const MyString &other);
+        MyString operator+(const MyString &othter);
 
         // string operator function
         // insert <char>str_to_insert in pos <int>i
@@ -37,6 +38,7 @@ class MyString
         int mystringLen() const; // get the length of the string('\0' not counted in)
 };
 
+/*================ construct & deconstruct functions ======================*/
 MyString::MyString()
 {
     string_ptr = new char [1];
@@ -75,14 +77,48 @@ MyString::~MyString()
     delete [] string_ptr;
     string_ptr = nullptr;
 }
+/*========================================================================*/
 
 
+/*===================== operator reload ==================================*/
+MyString &MyString::operator=(const MyString &other)
+{
+    if (this != &other)
+    {
+        int size = strlen(other.string_ptr) + 1;
+        delete [] string_ptr;
+        string_ptr = new char [size];
+        strcpy(string_ptr, other.string_ptr);
+        string_ptr[size-1] = '\0';
+    }
+    return *this;
+}
+
+MyString MyString::operator+(const MyString &other)
+{
+    int size_other = other.mystringLen();
+    int size_local = this->mystringLen();
+    int size_result = size_other + size_local;
+
+    // construct new MyString
+    MyString string_temp(*this);
+    // insert other at rear
+    string_temp.insert(other, size_local);
+    
+    return string_temp;
+}
+/*========================================================================*/
+
+
+/*==================== tring opearting functions =========================*/
+// insert <char>str_to_insert in pos <int>i
 void MyString::insert(char str_to_insert, int i) 
 {
     char temp[2] = {str_to_insert, '\0'};
     insert(temp, i);
 }
 
+// insert <char *>str_to_insert in pos <int>i
 void MyString::insert(const char *str_to_insert, int i)
 {
     int old_size = strlen(string_ptr);
@@ -121,6 +157,7 @@ void MyString::insert(const char *str_to_insert, int i)
     string_ptr = new_string_ptr;
 }
 
+// insert <MyString>str_to_insert in pos <int>i
 void MyString::insert(const MyString &str_to_insert, int i)
 {
     insert(str_to_insert.string_ptr, i);
@@ -195,20 +232,6 @@ int MyString::strPair(MyString my_str_local, MyString my_str_to_pair)
 }
 
 
-MyString &MyString::operator=(const MyString &other)
-{
-    if (this != &other)
-    {
-        int size = strlen(other.string_ptr) + 1;
-        delete [] string_ptr;
-        string_ptr = new char [size];
-        strcpy(string_ptr, other.string_ptr);
-        string_ptr[size-1] = '\0';
-    }
-    return *this;
-}
-
-
 void MyString::print() const 
 {
     int i=0;
@@ -224,6 +247,8 @@ int MyString::mystringLen() const
 {
     return strlen(string_ptr);
 }
+/*========================================================================*/
+
 
 int main()
 {
@@ -247,11 +272,18 @@ int main()
     // pairng check
     cout << "pairing code: " << MyString::strPair(my_str_2, my_str) << endl;
 
-
     // test print()
     my_str.print();
     my_str_1.print();
     my_str_2.print();
+
+    // opeartor reload test
+    MyString mystr_cpy1 = my_str;
+    MyString mystr_add1 = my_str_1 + my_str_2;
+
+    cout << "test opeartor reload: " << endl;
+    mystr_cpy1.print();
+    mystr_add1.print();
 
     // test mystringLen()
     cout << "length: " << my_str.mystringLen() << endl;
