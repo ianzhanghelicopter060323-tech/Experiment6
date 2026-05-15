@@ -9,7 +9,7 @@ class Date
         int day;   // can be 1~28, 1~29, 1~30, 1~31
 
         int LegalDate_judge(int year_to_judge, int month_to_judge, int day_to_judge); // 0 for "ILLEGAL", 1 for "LEAGAL"
-        int FirstDay_judge(); // 0 for "NOT first day"; 1 for "IS the first day of the month"; 2 for "IS the last day of the year";
+        int FirstDay_judge(); // 0 for "NOT first day"; 1 for "IS the first day of the month"; 2 for "IS the first day of the year";
         int LastDay_judge();   // 0 for "NOT last day"; 1 for "IS the last day of the month"; 2 for "IS the last day of the year"; 
         
         int Day_in_month(int Y, int M); // input Year/Month to get day numbers
@@ -25,6 +25,9 @@ class Date
 
         Date &operator--();    // -- Date
         Date operator --(int); // Date --
+
+        Date operator+(int D); // Date + <int>day
+        Date operator-(int D); // Date - <int>day
 
         int LeapYear_judge(int year_to_judge) const; // 1 for "IS leap year"; 0 for "NOT leap year"; -1 for illegal input
 
@@ -251,6 +254,7 @@ void Date::print() const
 }
 /* =============================================================================== */
 
+
 /* ======================= public judging function ===============================*/
 
 int Date::LeapYear_judge(int year_to_judge) const
@@ -270,31 +274,32 @@ int Date::LeapYear_judge(int year_to_judge) const
 
 
 /*============== operator reload ==============*/
+
 Date &Date::operator++()
 {
     if (this->LastDay_judge() == 2)
     {
-        if (year == -1) // 1 BC
+        if (this->year == -1) // 1 BC
         {
-            year = 1;   // 1 AD
-            month = 1;
-            day = 1;
+            this->year = 1;   // 1 AD
+            this->month = 1;
+            this->day = 1;
         }
         else
         {
-            year ++;
-            month = 1;
-            day = 1;
+            this->year ++;
+            this->month = 1;
+            this->day = 1;
         }
     }
     else if (this->LastDay_judge() == 1) // last day of the month
     {
         // year remain unchanged
-        month ++;
-        day = 1;
+        this->month ++;
+        this->day = 1;
     }
     else // ordinary day
-        day ++;
+        this->day ++;
     
     return *this;
 }
@@ -305,58 +310,57 @@ Date Date::operator++(int)
     
     if (this->LastDay_judge() == 2)
     {
-        if (year == -1) // 1 BC
+        if (this->year == -1) // 1 BC
         {
-            year = 1;   // 1 AD
-            month = 1;
-            day = 1;
+            this->year = 1;   // 1 AD
+            this->month = 1;
+            this->day = 1;
         }
         else
         {
-            year ++;
-            month = 1;
-            day = 1;
+            this->year ++;
+            this->month = 1;
+            this->day = 1;
         }
     }
     else if (this->LastDay_judge() == 1) // last day of the month
     {
         // year remain unchanged
-        month ++;
-        day = 1;
+        this->month ++;
+        this->day = 1;
     }
     else // ordinary day
-        day ++;
+        this->day ++;
 
     // return original object
     return Date(date_temp);
 }
 
-
 Date &Date::operator--()
 {
     if (this->FirstDay_judge() == 2) // first day of the year
     {
-        if (year == 1) // 1 AD
+        if (this->year == 1) // 1 AD
         {
-            year = -1;   // 1 BC
-            month = 12;
-            day = 31;
+            this->year = -1;   // 1 BC
+            this->month = 12;
+            this->day = 31;
         }
         else
         {
-            year --;
-            month = 12;
-            day = 31;
+            this->year --;
+            this->month = 12;
+            this->day = 31;
         }
     }
     else if (this->FirstDay_judge() == 1) // first day of the month
     {
         // year remain unchanged
-        month --;
-        day = this->Day_in_month(year, month - 1);
+        this->month --;
+        this->day = this->Day_in_month(this->year, this->month - 1);
     }
     else // ordinary day
-        day --;
+        this->day --;
     
     return *this;
 }
@@ -367,30 +371,53 @@ Date Date::operator--(int)
     
     if (this->FirstDay_judge() == 2) // first day of the year
     {
-        if (year == 1) // 1 AD
+        if (this->year == 1) // 1 AD
         {
-            year = -1;   // 1 BC
-            month = 12;
-            day = 31;
+            this->year = -1;   // 1 BC
+            this->month = 12;
+            this->day = 31;
         }
         else
         {
-            year --;
-            month = 12;
-            day = 31;
+            this->year --;
+            this->month = 12;
+            this->day = 31;
         }
     }
     else if (this->FirstDay_judge() == 1) // first day of the month
     {
         // year remain unchanged
-        month --;
-        day = this->Day_in_month(year, month - 1);
+        this->month --;
+        this->day = this->Day_in_month(this->year, this->month);
     }
     else // ordinary day
-        day --;
+        this->day --;
 
     return Date(date_temp);
 }
+
+Date Date::operator+(int D)
+{
+    Date date_temp(*this);
+    for (int i=1; i<=D; i++)
+    {
+        date_temp ++;
+    }
+
+    return Date(date_temp);
+}
+
+Date Date::operator-(int D)
+{
+    Date date_temp(*this);
+    for (int i=1; i<=D; i++)
+    {
+        date_temp --;
+    }
+
+    return Date(date_temp);
+}
+
 /*=============================================*/
 
 
@@ -402,6 +429,9 @@ int main()
     Date d_cpy2(d);
     Date d_cpy3(d);
     Date d_cpy4(d);
+
+    Date d_cpy5(d);
+    Date d_cpy6(d);
 
     // ++ date test
     d.print();
@@ -417,6 +447,10 @@ int main()
     (d_cpy4 --).print();
     d_cpy3.print();
     d_cpy4.print();
+    printf("\n");
+
+    (d_cpy5 + 366).print();
+    (d_cpy6 - 365).print();
 
     return 0;
 }
