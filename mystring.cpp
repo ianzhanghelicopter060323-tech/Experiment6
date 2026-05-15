@@ -17,6 +17,9 @@ class MyString
         // operator= reload
         MyString &operator=(const MyString &other);
         MyString operator+(const MyString &othter);
+        
+        MyString &operator++();     // ++ string
+        MyString &operator++(int);  // string ++
 
         // string operator function
         // insert <char>str_to_insert in pos <int>i
@@ -106,6 +109,40 @@ MyString MyString::operator+(const MyString &other)
     string_temp.insert(other, size_local);
     
     return string_temp;
+}
+
+// ++ string
+// move first element to the rear
+MyString &MyString::operator++()
+{
+    char head = this->string_ptr[0];
+    int size = this->mystringLen();
+
+    // move forward
+    for (int i=0; i<size; i++)
+    {
+        this->string_ptr[i] = this->string_ptr[i+1];
+    }
+    this->string_ptr[size-1] = head;
+
+    return *this;
+}
+
+// string ++
+// move last element to the head
+MyString &MyString::operator++(int) 
+{
+    int size = this->mystringLen();
+    char rear = this->string_ptr[size-1];
+
+    // move backward
+   for (int i=size-1; i>=1; i--)
+    {
+        this->string_ptr[i] = this->string_ptr[i-1];
+    }
+    this->string_ptr[0] = rear;
+
+    return *this;
 }
 /*========================================================================*/
 
@@ -284,6 +321,13 @@ int main()
     cout << "test opeartor reload: " << endl;
     mystr_cpy1.print();
     mystr_add1.print();
+
+    MyString mystr_plustest((char *)"abcd");
+
+    cout << "operator++ reload: " << endl;
+    mystr_plustest.print();
+    (++ mystr_plustest).print();
+    (mystr_plustest ++).print();
 
     // test mystringLen()
     cout << "length: " << my_str.mystringLen() << endl;
