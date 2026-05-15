@@ -21,6 +21,8 @@ class MyString
         MyString &operator++();     // ++ string
         MyString &operator++(int);  // string ++
 
+        friend ostream &operator<<(ostream &out, const MyString &str);
+
         // string operator function
         // insert <char>str_to_insert in pos <int>i
         void insert(char str_to_insert, int i);
@@ -144,6 +146,18 @@ MyString &MyString::operator++(int)
 
     return *this;
 }
+
+// operator<< reload
+ostream &operator<<(ostream &out, const MyString &str)
+{
+    for (int i=0; str.string_ptr[i] != '\0'; i++)
+    {
+        out << str.string_ptr[i];
+    }
+
+    return out;
+}
+
 /*========================================================================*/
 
 
@@ -328,6 +342,9 @@ int main()
     mystr_plustest.print();
     (++ mystr_plustest).print();
     (mystr_plustest ++).print();
+
+    cout << "operator<< reload: " << endl;
+    cout << my_str << endl;
 
     // test mystringLen()
     cout << "length: " << my_str.mystringLen() << endl;
