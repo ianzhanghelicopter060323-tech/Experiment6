@@ -1,5 +1,4 @@
 #include <iostream>
-#include <cstring>
 using namespace std;
 
 
@@ -43,6 +42,13 @@ class MyString
         int mystringLen() const; // get the length of the string('\0' not counted in)
 };
 
+
+/*============ self-defined string operator functions defination ============*/
+int stringLen(const char *str);
+void stringCopy(char *str_dest, const char *str_src);
+/*===========================================================================*/
+
+
 /*================ construct & deconstruct functions ======================*/
 MyString::MyString()
 {
@@ -52,28 +58,28 @@ MyString::MyString()
 
 MyString::MyString(const char *str)
 {
-    int size = strlen(str) + 1;
+    int size = stringLen(str) + 1;
 
     string_ptr = new char [size];
-    strcpy(string_ptr, str);
+    stringCopy(string_ptr, str);
     string_ptr[size-1] = '\0';
 }
 
 MyString::MyString(const MyString &str)
 {
-    int size = strlen(str.string_ptr) + 1;
+    int size = stringLen(str.string_ptr) + 1;
 
     string_ptr = new char [size];
-    strcpy(string_ptr, str.string_ptr);
+    stringCopy(string_ptr, str.string_ptr);
     string_ptr[size-1] = '\0';
 }
 
 MyString::MyString(const string &str)
 {
-    int size = strlen(str.c_str()) + 1;
+    int size = stringLen(str.c_str()) + 1;
 
     string_ptr = new char [size];
-    strcpy(string_ptr, str.c_str());
+    stringCopy(string_ptr, str.c_str());
     string_ptr[size-1] = '\0';
 }
 
@@ -90,10 +96,10 @@ MyString &MyString::operator=(const MyString &other)
 {
     if (this != &other)
     {
-        int size = strlen(other.string_ptr) + 1;
+        int size = stringLen(other.string_ptr) + 1;
         delete [] string_ptr;
         string_ptr = new char [size];
-        strcpy(string_ptr, other.string_ptr);
+        stringCopy(string_ptr, other.string_ptr);
         string_ptr[size-1] = '\0';
     }
     return *this;
@@ -101,9 +107,7 @@ MyString &MyString::operator=(const MyString &other)
 
 MyString MyString::operator+(const MyString &other)
 {
-    int size_other = other.mystringLen();
     int size_local = this->mystringLen();
-    int size_result = size_other + size_local;
 
     // construct new MyString
     MyString string_temp(*this);
@@ -116,9 +120,15 @@ MyString MyString::operator+(const MyString &other)
 // ++ string
 // move first element to the rear
 MyString &MyString::operator++()
-{
+{   
     char head = this->string_ptr[0];
     int size = this->mystringLen();
+
+    // empty-length check
+    if (size <= 1)
+    {
+        return *this;
+    }
 
     // move forward
     for (int i=0; i<size; i++)
@@ -136,6 +146,12 @@ MyString &MyString::operator++(int)
 {
     int size = this->mystringLen();
     char rear = this->string_ptr[size-1];
+
+    // empty-length check
+    if (size <= 1)
+    {
+        return *this;
+    }
 
     // move backward
    for (int i=size-1; i>=1; i--)
@@ -172,8 +188,8 @@ void MyString::insert(char str_to_insert, int i)
 // insert <char *>str_to_insert in pos <int>i
 void MyString::insert(const char *str_to_insert, int i)
 {
-    int old_size = strlen(string_ptr);
-    int insert_size = strlen(str_to_insert);
+    int old_size = stringLen(string_ptr);
+    int insert_size = stringLen(str_to_insert);
 
     if (i < 0 || i > old_size)
     {
@@ -231,7 +247,7 @@ void MyString::capitalize()
 
 void MyString::moveNumber()
 {
-    int len = strlen(string_ptr); // create new array instead of moving elements in original array
+    int len = stringLen(string_ptr); // create new array instead of moving elements in original array
     char *new_string_ptr = new char [len + 1];
     int index = 0;
 
@@ -260,8 +276,8 @@ void MyString::moveNumber()
 
 int MyString::strPair(MyString my_str_local, MyString my_str_to_pair)
 {
-    int size_local = strlen(my_str_local.string_ptr);
-    int size_pair = strlen(my_str_to_pair.string_ptr);
+    int size_local = stringLen(my_str_local.string_ptr);
+    int size_pair = stringLen(my_str_to_pair.string_ptr);
 
     if (size_local != size_pair) // if len not equal, straight FAIL
         return -1;
@@ -296,60 +312,105 @@ void MyString::print() const
 
 int MyString::mystringLen() const 
 {
-    return strlen(string_ptr);
+    return stringLen(string_ptr);
+}
+/*========================================================================*/
+
+
+/*===================== global string functions ===========================*/
+int stringLen(const char *str)
+{
+    int len = 0;
+    while (str[len] != '\0')
+    {
+        len ++;
+    }
+
+    return len;
+}
+
+void stringCopy(char *str_dest, const char *str_src)
+{
+    int i = 0;
+    while (str_src[i] != '\0')
+    {
+        str_dest[i] = str_src[i];
+        i ++;
+    }
+    str_dest[i] = '\0';
 }
 /*========================================================================*/
 
 
 int main()
 {
-    MyString my_str((char*)"H1e2llo");
+    // operator= reload test
+    MyString my_str_equal;
+    MyString my_str_string((char *)"world");
+    my_str_equal = my_str_string;
+    cout << "operator= reload: " << my_str_equal << endl;
 
-    // test string-to-MyString
-    string str = "Sieg Heil";
-    MyString my_str_1(str);
+    // operator+ reload test
+    MyString my_str_char((char *)"hello");
+    MyString my_str_add_other((char *)"world");
+    MyString my_str_add = my_str_char + my_str_add_other;
+    cout << "operator+ reload: " << my_str_add << endl;
 
-    // insert <char *>str
-    my_str_1.insert(my_str, 2);
+    // operator++ reload test
+    MyString my_str_left((char *)"abcd");
+    ++ my_str_left;
+    cout << "operator++ reload: " << my_str_left << endl;
+
+    // operator++(int) reload test
+    MyString my_str_right((char *)"abcd");
+    my_str_right ++;
+    cout << "operator++(int) reload: " << my_str_right << endl;
+
+    // operator<< reload test
+    MyString my_str_output((char *)"hello");
+    cout << "operator<< reload: " << my_str_output << endl;
+
+    // insert <char>str test
+    MyString my_str_insert_char((char *)"helo");
+    my_str_insert_char.insert('l', 3);
+    cout << "insert <char>str: " << my_str_insert_char << endl;
+
+    // insert <char *>str test
+    MyString my_str_insert_char_ptr((char *)"he");
+    my_str_insert_char_ptr.insert((char *)"llo", 2);
+    cout << "insert <char *>str: " << my_str_insert_char_ptr << endl;
+
+    // insert <MyString>str test
+    MyString my_str_insert_base((char *)"he");
+    MyString my_str_insert_other((char *)"llo");
+    my_str_insert_base.insert(my_str_insert_other, 2);
+    cout << "insert <MyString>str: " << my_str_insert_base << endl;
 
     // capitalization function test
-    my_str.capitalize();
+    MyString my_str_capital((char *)"HeLlo");
+    my_str_capital.capitalize();
+    cout << "capitalization function: " << my_str_capital << endl;
+
     // move number function test
-    my_str.moveNumber();
+    MyString my_str_number((char *)"H1e2l3lo");
+    my_str_number.moveNumber();
+    cout << "move number function: " << my_str_number << endl;
 
-    // test envalue operator
-    MyString my_str_2 = my_str_1;
+    // string pairing function test
+    MyString my_str_pair_1((char *)"hello");
+    MyString my_str_pair_2((char *)"hello");
+    MyString my_str_pair_3((char *)"world");
+    cout << "pairing succeed code: " << MyString::strPair(my_str_pair_1, my_str_pair_2) << endl;
+    cout << "pairing failed code: " << MyString::strPair(my_str_pair_1, my_str_pair_3) << endl;
 
-    // pairng check
-    cout << "pairing code: " << MyString::strPair(my_str_2, my_str) << endl;
+    // print function test
+    MyString my_str_print((char *)"hello");
+    cout << "print function: ";
+    my_str_print.print();
 
-    // test print()
-    my_str.print();
-    my_str_1.print();
-    my_str_2.print();
-
-    // opeartor reload test
-    MyString mystr_cpy1 = my_str;
-    MyString mystr_add1 = my_str_1 + my_str_2;
-
-    cout << "test opeartor reload: " << endl;
-    mystr_cpy1.print();
-    mystr_add1.print();
-
-    MyString mystr_plustest((char *)"abcd");
-
-    cout << "operator++ reload: " << endl;
-    mystr_plustest.print();
-    (++ mystr_plustest).print();
-    (mystr_plustest ++).print();
-
-    cout << "operator<< reload: " << endl;
-    cout << my_str << endl;
-
-    // test mystringLen()
-    cout << "length: " << my_str.mystringLen() << endl;
-    cout << "length1: " << my_str_1.mystringLen() << endl;
-    cout << "length2: " << my_str_2.mystringLen() << endl;
+    // mystringLen function test
+    MyString my_str_len((char *)"hello");
+    cout << "mystringLen function: " << my_str_len.mystringLen() << endl;
 
     return 0;
 }
