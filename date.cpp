@@ -10,8 +10,7 @@ class Date
 
         int LegalDate_judge(int year_to_judge, int month_to_judge, int day_to_judge); // 0 for "ILLEGAL", 1 for "LEAGAL"
         int FirstDay_judge(); // 0 for "NOT first day"; 1 for "IS the first day of the month"; 2 for "IS the first day of the year";
-        int LastDay_judge();   // 0 for "NOT last day"; 1 for "IS the last day of the month"; 2 for "IS the last day of the year"; 
-        
+        int LastDay_judge();   // 0 for "NOT last day"; 1 for "IS the last day of the month"; 2 for "IS the last day of the year";     
         int Day_in_month(int Y, int M); // input Year/Month to get day numbers
 
         // private operator reload
@@ -19,7 +18,7 @@ class Date
         friend int operator>(const Date &d1, const Date &d2); // 1 for "d1 > d2"; 0 for "d1 =< d2"
         friend int operator<(const Date &d1, const Date &d2); // 1 for "d1 < d2"; 0 for "d1 >= d2"
     public:
-        Date(): year(1), month(1), day(1){}
+        Date(): year(1), month(1), day(1){} // default date be 1/1/1 (Jan 1st 1AD)
         Date(int Y_in, int M_in, int D_in);
         Date(const Date &date);
         ~Date() {}
@@ -405,6 +404,12 @@ Date Date::operator--(int)
 
 Date Date::operator+(int D)
 {
+    if (D < 0) // illegal input judgement
+    {
+        cout << "ERROR! day must be positive" << endl;
+        return Date(); // return default date
+    }
+    
     Date date_temp(*this);
     for (int i=1; i<=D; i++)
     {
@@ -416,6 +421,12 @@ Date Date::operator+(int D)
 
 Date Date::operator-(int D)
 {
+    if (D < 0) // illegal input judgement
+    {
+        cout << "ERROR! day must be positive" << endl;
+        return Date(); // return default date
+    }
+
     Date date_temp(*this);
     for (int i=1; i<=D; i++)
     {
@@ -479,7 +490,7 @@ int operator<(const Date &d1, const Date &d2)
 
 int operator-(const Date &d1, const Date &d2)
 {
-    if (d1 < d2)
+    if (d1 < d2) // illegal input judgement
     {
         cout << "ERROR! d1 must be larger than d2" << endl;
         return -1;
