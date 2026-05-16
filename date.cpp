@@ -13,13 +13,18 @@ class Date
         int LastDay_judge();   // 0 for "NOT last day"; 1 for "IS the last day of the month"; 2 for "IS the last day of the year"; 
         
         int Day_in_month(int Y, int M); // input Year/Month to get day numbers
+
+        // private operator reload
+        friend int operator!=(const Date &d1, const Date &d2); // Date == Date: 1 for"DIFFERENT"; 0 for "SAME"
+        friend int operator>(const Date &d1, const Date &d2); // 1 for "d1 > d2"; 0 for "d1 =< d2"
+        friend int operator<(const Date &d1, const Date &d2); // 1 for "d1 < d2"; 0 for "d1 >= d2"
     public:
         Date(): year(1), month(1), day(1){}
         Date(int Y_in, int M_in, int D_in);
         Date(const Date &date);
         ~Date() {}
 
-        // operator reload
+        // public operator reload
         Date &operator++();    // ++ Date
         Date operator++(int);  // Date ++; 
 
@@ -29,6 +34,8 @@ class Date
         Date operator+(int D); // Date + <int>day
         Date operator-(int D); // Date - <int>day
 
+        friend int operator-(const Date &d1, const Date &d2); // d1 - d2; positive calue for "days between"; -1 for "error input"
+
         int LeapYear_judge(int year_to_judge) const; // 1 for "IS leap year"; 0 for "NOT leap year"; -1 for illegal input
 
         // date print: YYYY/MM/DD 
@@ -36,7 +43,7 @@ class Date
 };
 
 
-/* ===================== construct funcion ========================= */
+/* ============================= construct funcion ================================ */
 
 Date::Date(int Y_in, int M_in, int D_in)
 {
@@ -74,7 +81,7 @@ Date::Date(const Date &date)
         day = date.day;
     }
 }
-/* ================================================================== */
+/* =============================================================================== */
 
 
 /* ======================= privete judging function ===============================*/
@@ -273,7 +280,7 @@ int Date::LeapYear_judge(int year_to_judge) const
 /* =============================================================================== */
 
 
-/*============== operator reload ==============*/
+/*============================= operator reload ==================================*/
 
 Date &Date::operator++()
 {
@@ -418,8 +425,79 @@ Date Date::operator-(int D)
     return Date(date_temp);
 }
 
-/*=============================================*/
+int operator!=(const Date &d1, const Date &d2)
+{
+    if ((d1.year == d2.year) && (d1.month == d2.month) && (d1.day == d2.day))
+        return 0; // same 
+    else
+        return 1; // different
+}
 
+int operator>(const Date &d1, const Date &d2)
+{
+    if (d1.year > d2.year)
+        return 1;
+    else if (d1.year < d2.year)
+        return 0;
+    else // d1.year == d2.year
+    {
+        if (d1.month > d2.month)
+            return 1;
+        else if (d1.month < d2.month)
+            return 0;
+        else // d1.month == d2.month
+        {
+            if (d1.day > d2.day)
+                return 1;
+            else // d1.day <= d2.day
+                return 0;
+        }
+    }
+}
+
+int operator<(const Date &d1, const Date &d2)
+{
+    if (d1.year < d2.year)
+        return 1;
+    else if (d1.year > d2.year)
+        return 0;
+    else // d1.year == d2.year
+    {
+        if (d1.month < d2.month)
+            return 1;
+        else if (d1.month > d2.month)
+            return 0;
+        else // d1.month == d2.month
+        {
+            if (d1.day < d2.day)
+                return 1;
+            else // d1.day >= d2.day
+                return 0;
+        }
+    }
+}
+
+int operator-(const Date &d1, const Date &d2)
+{
+    if (d1 < d2)
+    {
+        cout << "ERROR! d1 must be larger than d2" << endl;
+        return -1;
+    }
+
+    Date date_temp(d1);
+    int day_count = 0;
+
+    while (date_temp != d2)
+    {
+        date_temp --; // date_temp --, till date_temp == d2
+        day_count ++;
+    }
+
+    return day_count;
+}
+
+/*=================================================================================*/
 
 
 int main()
@@ -432,6 +510,9 @@ int main()
 
     Date d_cpy5(d);
     Date d_cpy6(d);
+
+    Date d_cpy7(d);
+    Date d_cpy8(d);
 
     // ++ date test
     d.print();
@@ -451,6 +532,9 @@ int main()
 
     (d_cpy5 + 366).print();
     (d_cpy6 - 365).print();
+
+    // d - d test
+    cout << "days between: " << ((d_cpy7 +5) - (d_cpy8)) << endl;
 
     return 0;
 }
