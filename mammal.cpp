@@ -45,7 +45,7 @@ class Cat_abstract : public Mammal_abstract
         Cat_abstract():Mammal_abstract() {}
         Cat_abstract(string name_in, int age_in): Mammal_abstract(name_in, age_in) {} 
         Cat_abstract(const Cat_abstract &c_in): Mammal_abstract(c_in) {}
-        ~Cat_abstract() {cout << "CAT CLASS deleted" << endl;}
+        ~Cat_abstract() override {cout << "CAT CLASS deleted" << endl;}
 
         void Speak() override
         {
@@ -61,7 +61,7 @@ class Cat_normal : public Mammal_normal
         Cat_normal(): Mammal_normal() {}
         Cat_normal(string name_in, int age_in): Mammal_normal(name_in, age_in) {}
         Cat_normal(const Cat_normal &c_in): Mammal_normal(c_in) {}
-        ~Cat_normal() {cout << "CAT CLASS deleted" << endl;}
+        ~Cat_normal() override {cout << "CAT CLASS deleted" << endl;}
 
         void Speak() override
         {
@@ -78,7 +78,7 @@ class Dog_abstract : public Mammal_abstract
         Dog_abstract(): Mammal_abstract() {}
         Dog_abstract(string name_in, int age_in): Mammal_abstract(name_in, age_in) {} 
         Dog_abstract(const Dog_abstract &d_in): Mammal_abstract(d_in) {}
-        ~Dog_abstract() {cout << "DOG CLASS deleted" << endl;}
+        ~Dog_abstract() override {cout << "DOG CLASS deleted" << endl;}
 
         void Speak() override
         {
@@ -94,7 +94,7 @@ class Dog_normal : public Mammal_normal
         Dog_normal(): Mammal_normal() {}
         Dog_normal(string name_in, int age_in): Mammal_normal(name_in, age_in) {}
         Dog_normal(const Dog_normal &d_in): Mammal_normal(d_in) {}
-        ~Dog_normal() {cout << "DOG CLASS deleted" << endl;}
+        ~Dog_normal() override {cout << "DOG CLASS deleted" << endl;}
 
         void Speak() override
         {
@@ -105,7 +105,7 @@ class Dog_normal : public Mammal_normal
 };
 
 
-/* ====================== Mammal_abstract ====================== */
+/* ====================== Mammal_abstract &Mammal_normal ====================== */
 
 Mammal_abstract::Mammal_abstract()
 {
@@ -158,51 +158,43 @@ Mammal_normal::Mammal_normal(const Mammal_normal &m_in)
     name = m_in.name;
     age = m_in.age;
 }
-/* ============================================================= */
-
-
-/* ====================== Cat_abstract ====================== */
-
-/* ========================================================== */
-
-
-/* ====================== Dog_abstract ====================== */
-/* ========================================================== */
-
-
-/* ====================== Mammal_normal ====================== */
-/* =========================================================== */
-
-
-/* ====================== Cat_normal ====================== */
-/* ======================================================== */
-
-
-/* ====================== Dog_normal ====================== */
-/* ======================================================== */
+/* ========================================================================== */
 
 
 int main()
 {
-    Mammal_normal *m_n_cat = new Cat_normal((string)"Maodie", 2);
-    Mammal_normal *m_n_dog = new Dog_normal((string)"dagoujiao", 3);
+    // test Mammal_normal as a normal base class
+    Mammal_normal *m_n[3];
 
-    Mammal_abstract *m_a_cat = new Cat_abstract((string)"Laocai", 4);
-    Mammal_abstract *m_a_dog = new Dog_abstract((string)"Xuangou", 6);
+    m_n[0] = new Mammal_normal((string)"GO", 4);
+    m_n[1] = new Dog_normal((string)"Dahuang", 5);
+    m_n[2] = new Cat_normal((string)"Xiaomiao", 3);
 
-    m_n_cat->Speak();
-    m_n_dog->Speak();
+    cout << "normal base class test: " << endl;
+    for (int i = 0; i < 3; i++)
+    {
+        m_n[i]->Speak();
+        delete m_n[i];
+    }
     cout << endl;
 
-    m_a_cat->Speak();
-    m_a_dog->Speak();
+
+    // test Mammal_abstract as an abstract base class
+    Mammal_abstract *m_a[2];
+
+    // Mammal_abstract cannot create an object directly.
+    // m_a[0] = new Mammal_abstract((string)"GO", 4);
+
+    m_a[0] = new Dog_abstract((string)"Dahuang", 5);
+    m_a[1] = new Cat_abstract((string)"Xiaomiao", 3);
+
+    cout << "abstract base class test: " << endl;
+    for (int i = 0; i < 2; i++)
+    {
+        m_a[i]->Speak();
+        delete m_a[i];
+    }
     cout << endl;
 
-    // delete pointers
-    delete m_n_cat;
-    delete m_n_dog;
-
-    delete m_a_cat;
-    delete m_a_dog;
     return 0;
 }
