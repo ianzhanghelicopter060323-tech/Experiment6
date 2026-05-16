@@ -11,7 +11,7 @@ class Date
         int LegalDate_judge(int year_to_judge, int month_to_judge, int day_to_judge); // 0 for "ILLEGAL", 1 for "LEAGAL"
         int FirstDay_judge(); // 0 for "NOT first day"; 1 for "IS the first day of the month"; 2 for "IS the first day of the year";
         int LastDay_judge();   // 0 for "NOT last day"; 1 for "IS the last day of the month"; 2 for "IS the last day of the year";     
-        int Day_in_month(int Y, int M); // input Year/Month to get day numbers
+        int Day_in_month(int Y, int M); // input (<int>Year, <int>Month) to get day numbers: positice value for "days in the Month"; -1 for "illegal Month or Year input";
 
         // private operator reload
         friend int operator!=(const Date &d1, const Date &d2); // Date == Date: 1 for"DIFFERENT"; 0 for "SAME"
@@ -33,7 +33,7 @@ class Date
         Date operator+(int D); // Date + <int>day
         Date operator-(int D); // Date - <int>day
 
-        friend int operator-(const Date &d1, const Date &d2); // d1 - d2; positive calue for "days between"; -1 for "error input"
+        friend int operator-(const Date &d1, const Date &d2); // d1 - d2; positive value for "d1 > d2"; negative value for "d1 < d2"
 
         int LeapYear_judge(int year_to_judge) const; // 1 for "IS leap year"; 0 for "NOT leap year"; -1 for illegal input
 
@@ -54,12 +54,10 @@ Date::Date(int Y_in, int M_in, int D_in)
 
         cout << "ERROR! Date input illegal" << endl;
     }
-    else
-    {
-        year = Y_in;
-        month = M_in;
-        day = D_in;
-    }
+
+    year = Y_in;
+    month = M_in;
+    day = D_in;
 }
 
 
@@ -87,6 +85,12 @@ Date::Date(const Date &date)
 
 int Date::Day_in_month(int Y, int M)
 {
+    if (this->LegalDate_judge(Y, M, 1) == 0) // day always be leagl
+    {
+        cout << "ERROR! input year or month illegal" << endl;
+        return -1;
+    }    
+
     switch (M)
     {
     /* month with 31 days */ 
@@ -274,7 +278,7 @@ int Date::LeapYear_judge(int year_to_judge) const
     // divisible by 400 is leap year
     // divisible by 4 is leap year.
     // divisible by 100 is not
-    return (year % 400 == 0) || (year % 4 == 0 && year % 100 != 0);
+    return (year_to_judge % 400 == 0) || (year_to_judge % 4 == 0 && year_to_judge % 100 != 0);
 }
 /* =============================================================================== */
 
@@ -363,7 +367,7 @@ Date &Date::operator--()
     {
         // year remain unchanged
         this->month --;
-        this->day = this->Day_in_month(this->year, this->month - 1);
+        this->day = this->Day_in_month(this->year, this->month);
     }
     else // ordinary day
         this->day --;
@@ -490,19 +494,24 @@ int operator<(const Date &d1, const Date &d2)
 
 int operator-(const Date &d1, const Date &d2)
 {
-    if (d1 < d2) // illegal input judgement
-    {
-        cout << "ERROR! d1 must be larger than d2" << endl;
-        return -1;
-    }
-
     Date date_temp(d1);
     int day_count = 0;
 
-    while (date_temp != d2)
+    if (d1 < d2) 
     {
-        date_temp --; // date_temp --, till date_temp == d2
-        day_count ++;
+        while (date_temp != d2)
+        {
+            date_temp ++; // date_temp ++, till date_temp == d2
+            day_count --;
+        }
+    }
+    else
+    {
+        while (date_temp != d2)
+        {
+            date_temp --; // date_temp --, till date_temp == d2
+            day_count ++;
+        }
     }
 
     return day_count;
@@ -513,39 +522,108 @@ int operator-(const Date &d1, const Date &d2)
 
 int main()
 {
-    Date d(2016, 1, 1);
-    Date d_cpy1(d);
-    Date d_cpy2(d);
-    Date d_cpy3(d);
-    Date d_cpy4(d);
+    // print() test
+    Date print_test(2015, 2, 2);
+    cout << "print_test: ";
+    print_test.print();
+    cout << endl;
 
-    Date d_cpy5(d);
-    Date d_cpy6(d);
 
-    Date d_cpy7(d);
-    Date d_cpy8(d);
+    // LeapYear_judge() test
+    Date leap_year_test(2016, 1, 1);
+    cout << "2016 is leap year: " << leap_year_test.LeapYear_judge(2016) << endl;
+    cout << "2017 is leap year: " << leap_year_test.LeapYear_judge(2017) << endl;
+    cout << "1900 is leap year: " << leap_year_test.LeapYear_judge(1900) << endl;
+    cout << "2000 is leap year: " << leap_year_test.LeapYear_judge(2000) << endl;
+    cout << endl;
 
-    // ++ date test
-    d.print();
-    printf("\n");
 
-    (++ d_cpy1).print();
-    (d_cpy2 ++).print();
-    d_cpy1.print();
-    d_cpy2.print();
-    printf("\n");
+    // operator++() test: prefix ++
+    Date prefix_add_normal(2015, 2, 2);
+    Date prefix_add_month_end(2015, 2, 28);
+    Date prefix_add_leap_feb_28(2016, 2, 28);
+    Date prefix_add_leap_feb_29(2016, 2, 29);
+    Date prefix_add_year_end(2015, 12, 31);
 
-    (-- d_cpy3).print();
-    (d_cpy4 --).print();
-    d_cpy3.print();
-    d_cpy4.print();
-    printf("\n");
+    cout << "2015/2/2 after ++: ";
+    (++ prefix_add_normal).print();
+    cout << "2015/2/28 after ++: ";
+    (++ prefix_add_month_end).print();
+    cout << "2016/2/28 after ++: ";
+    (++ prefix_add_leap_feb_28).print();
+    cout << "2016/2/29 after ++: ";
+    (++ prefix_add_leap_feb_29).print();
+    cout << "2015/12/31 after ++: ";
+    (++ prefix_add_year_end).print();
+    cout << endl;
 
-    (d_cpy5 + 366).print();
-    (d_cpy6 - 365).print();
 
-    // d - d test
-    cout << "days between: " << ((d_cpy7 +5) - (d_cpy8)) << endl;
+    // operator++(int) test: postfix ++
+    Date postfix_add_test(2015, 2, 28);
+    Date postfix_add_return = postfix_add_test ++;
+
+    cout << "postfix ++ returned date: ";
+    postfix_add_return.print();
+    cout << "postfix ++ current date: ";
+    postfix_add_test.print();
+    cout << endl;
+
+
+    // operator--() test: prefix --
+    Date prefix_sub_normal(2015, 2, 2);
+    Date prefix_sub_common_feb(2015, 3, 1);
+    Date prefix_sub_leap_feb(2016, 3, 1);
+    Date prefix_sub_year_begin(2016, 1, 1);
+
+    cout << "2015/2/2 after --: ";
+    (-- prefix_sub_normal).print();
+    cout << "2015/3/1 after --: ";
+    (-- prefix_sub_common_feb).print();
+    cout << "2016/3/1 after --: ";
+    (-- prefix_sub_leap_feb).print();
+    cout << "2016/1/1 after --: ";
+    (-- prefix_sub_year_begin).print();
+    cout << endl;
+
+
+    // operator--(int) test: postfix --
+    Date postfix_sub_test(2016, 3, 1);
+    Date postfix_sub_return = postfix_sub_test --;
+
+    cout << "postfix -- returned date: ";
+    postfix_sub_return.print();
+    cout << "postfix -- current date: ";
+    postfix_sub_test.print();
+    cout << endl;
+
+
+    // operator+(int) test
+    Date add_days_test(2015, 2, 2);
+
+    cout << "2015/2/2 + 100: ";
+    (add_days_test + 100).print();
+    cout << "original date after + 100: ";
+    add_days_test.print();
+    cout << endl;
+
+
+    // operator-(int) test
+    Date sub_days_test(2015, 2, 2);
+
+    cout << "2015/2/2 - 100: ";
+    (sub_days_test - 100).print();
+    cout << "original date after - 100: ";
+    sub_days_test.print();
+    cout << endl;
+
+
+    // operator-(const Date &, const Date &) test
+    cout << "2016/3/1 - 2016/2/28: "
+         << (Date(2016, 3, 1) - Date(2016, 2, 28)) << endl;
+    cout << "2017/3/1 - 2017/2/28: "
+         << (Date(2017, 3, 1) - Date(2017, 2, 28)) << endl;
+    cout << "2015/1/1 - 2015/2/2: "
+         << (Date(2015, 1, 1) - Date(2015, 2, 2)) << endl;
 
     return 0;
 }
